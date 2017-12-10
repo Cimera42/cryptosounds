@@ -73,7 +73,7 @@ Uses the difference between the overall trading price and price of each transact
 			</td>
 		</tr>
 		<tr>
-			<td><a href="https://www.okex.com//">OKEX</a></td>
+			<td><a href="https://www.okex.com">OKEX</a></td>
 			<td>
 				<ul>
 					<li>BCH</li>
