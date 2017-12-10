@@ -9,7 +9,7 @@ let dataArray;
 
 let exchangeWebsocket; 
 let exchange;
-let btcPrice;
+let currencyPrice;
 let transactionType;
 let product;
 
@@ -62,6 +62,8 @@ function initWebsocket()
 		exchangeWebsocket = new WebSocket("wss://ws-feed.gdax.com");
 	else if(exchange === "Bitfinex")
 		exchangeWebsocket = new WebSocket("wss://api.bitfinex.com/ws/2");
+	else if(exchange === "OKEX")
+		exchangeWebsocket = new WebSocket("wss://real.okex.com:10441/websocket");
 
 	exchangeWebsocket.onopen = websocketOpen;
 	exchangeWebsocket.onclose = websocketClose;
@@ -71,12 +73,16 @@ function initWebsocket()
 		exchangeWebsocket.onmessage = gdaxMessage;
 	else if(exchange === "Bitfinex")
 		exchangeWebsocket.onmessage = bitfinexMessage;
+	else if(exchange === "OKEX")
+		exchangeWebsocket.onmessage = okexMessage;
 
 	transactionType = document.getElementById("transactionType").value;
 	if(exchange === "GDAX")
 		product = document.getElementById("gdaxCurrencyPair").value;
 	else if(exchange === "Bitfinex")
 		product = "t" + document.getElementById("bitfinexCurrencyOne").value + "" + document.getElementById("bitfinexCurrencyTwo").value;
+	else if(exchange === "OKEX")
+		product = document.getElementById("okexCurrencyPair").value;
 }
 
 function websocketOpen(e)
@@ -86,12 +92,26 @@ function websocketOpen(e)
 		gdaxSubscribe([product]);
 	else if(exchange === "Bitfinex")
 		bitfinexSubscribe(product);
+	else if(exchange === "OKEX")
+		okexSubscribe(product);
 }
 
 function gdaxSubscribe(products)
 {
 	exchangeWebsocket.send(JSON.stringify({
 		"type": "subscribe",
+		"product_ids": products,
+		"channels": [
+			"level2",
+			"ticker",
+		]
+	}));
+}
+
+function gdaxUnsubscribe(products)
+{
+	exchangeWebsocket.send(JSON.stringify({
+		"type": "unsubscribe",
 		"product_ids": products,
 		"channels": [
 			"level2",
@@ -135,15 +155,27 @@ function bitfinexUnsubscribe(product)
 	}
 }
 
-function gdaxUnsubscribe(products)
+function okexSubscribe(products)
 {
 	exchangeWebsocket.send(JSON.stringify({
-		"type": "unsubscribe",
-		"product_ids": products,
-		"channels": [
-			"level2",
-			"ticker",
-		]
+		event: "addChannel",
+		channel: "ok_sub_spot_" + products + "_ticker"
+	}));
+	exchangeWebsocket.send(JSON.stringify({
+		event: "addChannel",
+		channel: "ok_sub_spot_" + products + "_deals"
+	}));
+}
+
+function okexUnsubscribe(products)
+{
+	exchangeWebsocket.send(JSON.stringify({
+		event: "removeChannel",
+		channel: "ok_sub_spot_" + products + "_ticker"
+	}));
+	exchangeWebsocket.send(JSON.stringify({
+		event: "removeChannel",
+		channel: "ok_sub_spot_" + products + "_deals"
 	}));
 }
 
@@ -167,18 +199,18 @@ function gdaxMessage(e)
 	let data = JSON.parse(e.data);
 	if(data.type === "ticker")
 	{
-		btcPrice = data.price;
+		currencyPrice = data.price;
 	}
 	else if(data.type === "l2update")
 	{
-		if(btcPrice)
+		if(currencyPrice)
 		{
 			if(data.changes)
 			{
 				if(transactionType === "both" || data.changes[0][0] === transactionType)
 				{
 					oscillator.frequency.linearRampToValueAtTime(
-						data.changes[0][1] - btcPrice + 300,
+						data.changes[0][1] - currencyPrice + 300,
 						audioContext.currentTime + 0.001
 					);
 				}
@@ -210,18 +242,18 @@ function bitfinexMessage(e)
 		{
 			if(data[0] === bitfinexTickerChannelID)
 			{
-				btcPrice = data[1][0];
+				currencyPrice = data[1][0];
 			}
 			else if(data[0] ===  bitfinexTradeChannelID)
 			{
-				if(btcPrice && data[1] === "tu")
+				if(currencyPrice && data[1] === "tu")
 				{
 					if(transactionType === "both" 
 						|| (data[2][2] < 0 && transactionType === "sell")
 						|| (data[2][2] > 0 && transactionType === "buy"))
 					{
 						oscillator.frequency.linearRampToValueAtTime(
-							data[2][3] - btcPrice + 300,
+							data[2][3] - currencyPrice + 300,
 							audioContext.currentTime + 0.001
 						);
 					}
@@ -236,6 +268,38 @@ function bitfinexMessage(e)
 		if(data.msg === "symbol: invalid")
 		{
 			document.getElementById("failedPairMessage").style.display = "block";
+		}
+	}
+	else
+	{
+		console.log(data);
+	}
+}
+
+function okexMessage(e)
+{
+	let data = JSON.parse(e.data);
+	if(data[0].channel)
+	{
+		if(data[0].channel.includes("ticker"))
+		{
+			currencyPrice = data[0].data.buy;
+		}
+		else if(data[0].channel.includes("deals"))
+		{
+			if(transactionType === "both" 
+				|| (data[0].data[0][4] == "ask" && transactionType === "sell")
+				|| (data[0].data[0][4] == "bid" && transactionType === "buy"))
+			{
+				oscillator.frequency.linearRampToValueAtTime(
+					data[0].data[0][1] - currencyPrice + 300,
+					audioContext.currentTime + 0.001
+				);
+			}
+		}
+		else
+		{
+			console.log(data);
 		}
 	}
 	else
@@ -294,6 +358,12 @@ function currencyPairChanged(e)
 		product = "t" + document.getElementById("bitfinexCurrencyOne").value + "" + document.getElementById("bitfinexCurrencyTwo").value;
 		bitfinexSubscribe(product);
 	}
+	else if(exchange === "OKEX")
+	{
+		okexUnsubscribe(product);
+		product = e.target.value;
+		okexSubscribe(product);
+	}
 }
 
 function exchangeChoiceChanged(e)
@@ -301,7 +371,6 @@ function exchangeChoiceChanged(e)
 	exchange = e.target.value;
 
 	changeExchange();
-
 	initWebsocket();
 }
 
@@ -311,10 +380,18 @@ function changeExchange()
 	{
 		document.getElementById("gdaxCurrencyPairDiv").style.display = "block";
 		document.getElementById("bitfinexCurrencyPairDiv").style.display = "none";
+		document.getElementById("okexCurrencyPairDiv").style.display = "none";
 	}
 	else if(exchange === "Bitfinex")
 	{
 		document.getElementById("gdaxCurrencyPairDiv").style.display = "none";
 		document.getElementById("bitfinexCurrencyPairDiv").style.display = "block";
+		document.getElementById("okexCurrencyPairDiv").style.display = "none";
+	}
+	else if(exchange === "OKEX")
+	{
+		document.getElementById("gdaxCurrencyPairDiv").style.display = "none";
+		document.getElementById("bitfinexCurrencyPairDiv").style.display = "none";
+		document.getElementById("okexCurrencyPairDiv").style.display = "block";
 	}
 }

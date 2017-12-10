@@ -16,6 +16,7 @@
 		<select name="exchangeChoice" id="exchangeChoice" oninput="exchangeChoiceChanged(event)">
 			<option value="GDAX">GDAX</option>
 			<option value="Bitfinex">Bitfinex</option>
+			<option value="OKEX">OKEX</option>
 		</select>
 		<br>
 			<label for="transactionType">Transaction Type:</label>
@@ -39,6 +40,32 @@
 				<option value="LTC-USD">LTC-USD</option>
 				<option value="LTC-BTC">LTC-BTC</option>
 				<option value="LTC-EUR">LTC-EUR</option>
+			</select>
+		</div>
+		<div id="okexCurrencyPairDiv">
+			<label for="okexCurrencyPair">GDAX Currency Pair:</label>
+			<select name="okexCurrencyPair" id="okexCurrencyPair" oninput="currencyPairChanged(event)">
+				<option value="btc_usdt" selected>btc_usdt</option>
+				<option value="ltc_btc">ltc_btc</option>
+				<option value="eth_btc">eth_btc</option>
+				<option value="etc_btc">etc_btc</option>
+				<option value="bch_btc">bch_btc</option>
+				<option value="eth_usdt">eth_usdt</option>
+				<option value="ltc_usdt">ltc_usdt</option>
+				<option value="etc_usdt">etc_usdt</option>
+				<option value="bch_usdt">bch_usdt</option>
+				<option value="etc_eth">etc_eth</option>
+				<option value="bt1_btc">bt1_btc</option>
+				<option value="bt2_btc">bt2_btc</option>
+				<option value="btg_btc">btg_btc</option>
+				<option value="qtum_btc">qtum_btc</option>
+				<option value="hsr_btc">hsr_btc</option>
+				<option value="neo_btc">neo_btc</option>
+				<option value="gas_btc">gas_btc</option>
+				<option value="qtum_usdt">qtum_usdt</option>
+				<option value="hsr_usdt">hsr_usdt</option>
+				<option value="neo_usdt">neo_usdt</option>
+				<option value="gas_usdt">gas_usdt</option>
 			</select>
 		</div>
 		<div id="bitfinexCurrencyPairDiv">
