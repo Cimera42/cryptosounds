@@ -1,0 +1,13 @@
+{
+  "name": "cryptosound",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Tim Porritt",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "scripts": {
+	  "start": "node index"
+  }
+}

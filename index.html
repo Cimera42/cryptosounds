@@ -1,0 +1,60 @@
+<!-- Tim Porritt 2017 -->
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script defer src="code.js"></script>
+	</head>
+	<body onload="init()">
+		<canvas id="canvas" width="640" height="480"></canvas>
+		<br>
+		<label for="exchangeChoice">Exchange:</label>
+		<select name="exchangeChoice" id="exchangeChoice" oninput="exchangeChoiceChanged(event)">
+			<option value="GDAX">GDAX</option>
+			<option value="Bitfinex">Bitfinex</option>
+		</select>
+		<br>
+			<label for="transactionType">Transaction Type:</label>
+			<select name="transactionType" id="transactionType" oninput="transactionTypeChanged(event)">
+				<option value="buy">Buy</option>
+				<option value="sell">Sell</option>
+				<option value="both" selected>Buy/Sell</option>
+			</select>
+		<br>
+		<div id="gdaxCurrencyPairDiv">
+			<label for="gdaxCurrencyPair">GDAX Currency Pair:</label>
+			<select name="gdaxCurrencyPair" id="gdaxCurrencyPair" oninput="currencyPairChanged(event)">
+				<option value="BTC-USD" selected>BTC-USD</option>
+				<option value="BTC-EUR">BTC-EUR</option>
+				<option value="BTC-GBP">BTC-GBP</option>
+
+				<option value="ETH-USD">ETH-USD</option>
+				<option value="ETH-BTC">ETH-BTC</option>
+				<option value="ETH-EUR">ETH-EUR</option>
+
+				<option value="LTC-USD">LTC-USD</option>
+				<option value="LTC-BTC">LTC-BTC</option>
+				<option value="LTC-EUR">LTC-EUR</option>
+			</select>
+		</div>
+		<div id="bitfinexCurrencyPairDiv">
+			<label for="bitfinexCurrencyOne">Currency 1:</label>
+			<select name="bitfinexCurrencyOne" id="bitfinexCurrencyOne" oninput="currencyPairChanged(event)">
+				<option value="BTC" selected>BTC</option>
+				<option value="USD">USD</option>
+				<option value="ETH">ETH</option>
+			</select>
+			<br>
+			<label for="bitfinexCurrencyTwo">Currency 2:</label>
+			<select name="bitfinexCurrencyTwo" id="bitfinexCurrencyTwo" oninput="currencyPairChanged(event)">
+				<option value="BTC">BTC</option>
+				<option value="USD" selected>USD</option>
+				<option value="ETH">ETH</option>
+			</select>
+			<div id="failedPairMessage" style="display:none; font-size: 2em;">
+				<br>
+				Pair failed, please choose another.
+			</div>
+		</div>
+	</body>
+</html>
