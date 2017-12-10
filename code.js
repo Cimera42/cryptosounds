@@ -3,6 +3,7 @@
 let audioContext;
 let oscillator;
 let gain;
+let stereoPanner;
 let analyser;
 let dataArray;
 
@@ -26,7 +27,10 @@ function init()
 	oscillator.type = oscillator.SINE;
 
 	gain = audioContext.createGain();
-	gain.gain.value = 0.1;
+	gain.gain.value = document.getElementById("volume").value;
+	document.getElementById("volumeOutput").value = parseFloat(document.getElementById("volume").value).toFixed(2);
+
+	stereoPanner = audioContext.createStereoPanner();
 
 	analyser = audioContext.createAnalyser();
 	analyser.fftSize = 4096;
@@ -35,7 +39,7 @@ function init()
 	analyser.getByteTimeDomainData(dataArray);
 
 	oscillator.connect(analyser);
-	analyser.connect(gain);
+	oscillator.connect(gain);
 	gain.connect(audioContext.destination);
 
 	exchange = document.getElementById("exchangeChoice").value;
@@ -59,9 +63,9 @@ function initWebsocket()
 	else if(exchange === "Bitfinex")
 		exchangeWebsocket = new WebSocket("wss://api.bitfinex.com/ws/2");
 
-	exchangeWebsocket.onopen = gdaxOpen;
-	exchangeWebsocket.onclose = gdaxClose;
-	exchangeWebsocket.onerror = gdaxError;
+	exchangeWebsocket.onopen = websocketOpen;
+	exchangeWebsocket.onclose = websocketClose;
+	exchangeWebsocket.onerror = websocketError;
 
 	if(exchange === "GDAX")
 		exchangeWebsocket.onmessage = gdaxMessage;
@@ -75,7 +79,7 @@ function initWebsocket()
 		product = "t" + document.getElementById("bitfinexCurrencyOne").value + "" + document.getElementById("bitfinexCurrencyTwo").value;
 }
 
-function gdaxOpen(e)
+function websocketOpen(e)
 {
 	console.log(e);
 	if(exchange === "GDAX")
@@ -143,7 +147,7 @@ function gdaxUnsubscribe(products)
 	}));
 }
 
-function gdaxClose(e)
+function websocketClose(e)
 {
 	console.log(e);
 
@@ -151,7 +155,7 @@ function gdaxClose(e)
 	initWebsocket();
 }
 
-function gdaxError(e)
+function websocketError(e)
 {
 	console.log(e);
 }
@@ -237,6 +241,15 @@ function bitfinexMessage(e)
 	else
 	{
 		console.log(data);
+	}
+}
+
+function volumeChange(e)
+{
+	if(gain)
+	{
+		gain.gain.linearRampToValueAtTime(e.target.value, audioContext.currentTime + 0.001);
+		document.getElementById("volumeOutput").value = parseFloat(e.target.value).toFixed(2);
 	}
 }
 

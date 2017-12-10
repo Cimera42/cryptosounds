@@ -8,6 +8,10 @@
 	<body onload="init()">
 		<canvas id="canvas" width="640" height="480"></canvas>
 		<br>
+			<label for="volume">Volume:</label>
+			<input id="volume" type="range" min="0" max="1" step="any" value="0.1" oninput="volumeChange(event)">
+			<output id="volumeOutput" for="volume"></output>
+		<br>
 		<label for="exchangeChoice">Exchange:</label>
 		<select name="exchangeChoice" id="exchangeChoice" oninput="exchangeChoiceChanged(event)">
 			<option value="GDAX">GDAX</option>
