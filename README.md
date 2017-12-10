@@ -72,6 +72,30 @@ Uses the difference between the overall trading price and price of each transact
 				</ul>
 			</td>
 		</tr>
+		<tr>
+			<td><a href="https://www.okex.com//">OKEX</a></td>
+			<td>
+				<ul>
+					<li>BCH</li>
+					<li>BT1</li>
+					<li>BT2</li>
+					<li>BTC</li>
+					<li>BTG</li>
+					<li>ETC</li>
+					<li>ETH</li>
+					<li>GAS</li>
+					<li>HSR</li>
+					<li>LTC</li>
+					<li>NEO</li>
+					<li>QTUM</li>
+				</ul>
+			</td>
+			<td>
+				<ul>
+					<li>USD</li>
+				</ul>
+			</td>
+		</tr>
 	</tbody>
 </table>
 All pair combinations not necessarily available and are subject to change, please check each exchanges website for up to date and accurate information.
