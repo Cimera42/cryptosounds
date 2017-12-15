@@ -30,8 +30,8 @@ function init()
 	gain = audioContext.createGain();
 	gain.gain.value = document.getElementById("volume").value;
 	document.getElementById("volumeOutput").value = parseFloat(document.getElementById("volume").value).toFixed(2);
-	multiplier = document.getElementById("multiplier").value;
-	document.getElementById("multiplierOutput").value = parseFloat(multiplier).toFixed(2);
+	
+	setMultiplier(document.getElementById("multiplier").value);
 
 	stereoPanner = audioContext.createStereoPanner();
 
@@ -320,17 +320,27 @@ function volumeChange(e)
 	}
 }
 
-function multiplierChange(e)
+function setMultiplier(val)
 {
-	multiplier = e.target.value;
+	if(val < 0)
+		multiplier = 1 + parseFloat(val);
+	else if(val > 0)
+		multiplier = val*100;
+	else
+		multiplier = 1;
+
 	document.getElementById("multiplierOutput").value = parseFloat(multiplier).toFixed(2);
 }
 
-function resetMultplier(e)
+function multiplierChange(e)
 {
-	multiplier = 1;
-	document.getElementById("multiplier").value = 1;
-	document.getElementById("multiplierOutput").value = parseFloat(multiplier).toFixed(2);
+	setMultiplier(e.target.value);
+}
+
+function resetMultiplier(e)
+{
+	setMultiplier(0);
+	document.getElementById("multiplier").value = 0;
 }
 
 function draw()
