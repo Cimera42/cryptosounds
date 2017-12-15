@@ -6,6 +6,7 @@ let gain;
 let stereoPanner;
 let analyser;
 let dataArray;
+let multiplier;
 
 let exchangeWebsocket; 
 let exchange;
@@ -29,6 +30,8 @@ function init()
 	gain = audioContext.createGain();
 	gain.gain.value = document.getElementById("volume").value;
 	document.getElementById("volumeOutput").value = parseFloat(document.getElementById("volume").value).toFixed(2);
+	multiplier = document.getElementById("multiplier").value;
+	document.getElementById("multiplierOutput").value = parseFloat(multiplier).toFixed(2);
 
 	stereoPanner = audioContext.createStereoPanner();
 
@@ -210,7 +213,7 @@ function gdaxMessage(e)
 				if(transactionType === "both" || data.changes[0][0] === transactionType)
 				{
 					oscillator.frequency.linearRampToValueAtTime(
-						data.changes[0][1] - currencyPrice + 300,
+						(data.changes[0][1] - currencyPrice)*multiplier + 300,
 						audioContext.currentTime + 0.001
 					);
 				}
@@ -253,7 +256,7 @@ function bitfinexMessage(e)
 						|| (data[2][2] > 0 && transactionType === "buy"))
 					{
 						oscillator.frequency.linearRampToValueAtTime(
-							data[2][3] - currencyPrice + 300,
+							(data[2][3] - currencyPrice)*multiplier + 300,
 							audioContext.currentTime + 0.001
 						);
 					}
@@ -292,7 +295,7 @@ function okexMessage(e)
 				|| (data[0].data[0][4] == "bid" && transactionType === "buy"))
 			{
 				oscillator.frequency.linearRampToValueAtTime(
-					data[0].data[0][1] - currencyPrice + 300,
+					(data[0].data[0][1] - currencyPrice)*multiplier + 300,
 					audioContext.currentTime + 0.001
 				);
 			}
@@ -315,6 +318,19 @@ function volumeChange(e)
 		gain.gain.linearRampToValueAtTime(e.target.value, audioContext.currentTime + 0.001);
 		document.getElementById("volumeOutput").value = parseFloat(e.target.value).toFixed(2);
 	}
+}
+
+function multiplierChange(e)
+{
+	multiplier = e.target.value;
+	document.getElementById("multiplierOutput").value = parseFloat(multiplier).toFixed(2);
+}
+
+function resetMultplier(e)
+{
+	multiplier = 1;
+	document.getElementById("multiplier").value = 1;
+	document.getElementById("multiplierOutput").value = parseFloat(multiplier).toFixed(2);
 }
 
 function draw()
