@@ -17,6 +17,9 @@
 					ondblclick="resetMultiplier(event)" title="Double click to reset">
 			<output id="multiplierOutput" for="multiplier"></output>
 		<br>
+			<label for="psychadelic">Psychadelic colours:</label>
+			<input id="psychadelic" type="checkbox" oninput="psychadelicChange(event)">
+		<br>
 		<label for="exchangeChoice">Exchange:</label>
 		<select name="exchangeChoice" id="exchangeChoice" oninput="exchangeChoiceChanged(event)">
 			<option value="GDAX">GDAX</option>

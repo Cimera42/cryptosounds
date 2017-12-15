@@ -19,6 +19,10 @@ let bitfinexTickerChannelID;
 
 let canvas;
 let ctx;
+let currentCol;
+let targetCol;
+let lastTime;
+let doPsychadelic;
 
 function init()
 {
@@ -51,6 +55,10 @@ function init()
 
 	canvas = document.getElementById("canvas");
 	ctx = canvas.getContext("2d");
+	currentCol = 0;
+	targetCol = 0;
+	lastTime = Date.now();
+	doPsychadelic = document.getElementById("psychadelic").checked;
 	draw();
 
 	oscillator.start();
@@ -195,6 +203,15 @@ function websocketError(e)
 	console.log(e);
 }
 
+function setFrequency(price)
+{
+	oscillator.frequency.linearRampToValueAtTime(
+		(price - currencyPrice)*multiplier + 300,
+		audioContext.currentTime + 0.001
+	);
+	targetCol = (price - currencyPrice)*multiplier;
+}
+
 function gdaxMessage(e)
 {
 	// console.log(e);
@@ -212,10 +229,7 @@ function gdaxMessage(e)
 			{
 				if(transactionType === "both" || data.changes[0][0] === transactionType)
 				{
-					oscillator.frequency.linearRampToValueAtTime(
-						(data.changes[0][1] - currencyPrice)*multiplier + 300,
-						audioContext.currentTime + 0.001
-					);
+					setFrequency(data.changes[0][1]);
 				}
 			}
 		}
@@ -255,10 +269,7 @@ function bitfinexMessage(e)
 						|| (data[2][2] < 0 && transactionType === "sell")
 						|| (data[2][2] > 0 && transactionType === "buy"))
 					{
-						oscillator.frequency.linearRampToValueAtTime(
-							(data[2][3] - currencyPrice)*multiplier + 300,
-							audioContext.currentTime + 0.001
-						);
+						setFrequency(data[2][3]);
 					}
 				}
 			}
@@ -294,10 +305,7 @@ function okexMessage(e)
 				|| (data[0].data[0][4] == "ask" && transactionType === "sell")
 				|| (data[0].data[0][4] == "bid" && transactionType === "buy"))
 			{
-				oscillator.frequency.linearRampToValueAtTime(
-					(data[0].data[0][1] - currencyPrice)*multiplier + 300,
-					audioContext.currentTime + 0.001
-				);
+				setFrequency(data[0].data[0][1]);
 			}
 		}
 		else
@@ -347,17 +355,33 @@ function draw()
 {
 	analyser.getByteFrequencyData(dataArray);
 
-	ctx.fillStyle = "rgb(161,230,156)";
+	if(doPsychadelic)
+	{
+		let now = Date.now();
+		let dt = (now - lastTime)/1000;
+		lastTime = now;
+		currentCol += (0-targetCol)*(dt*0.25);
+		ctx.fillStyle = "hsl(" + (120+currentCol) + ",100%,80%)";
+	}
+	else
+		ctx.fillStyle = "rgb(161,230,156)";
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-	ctx.fillStyle = "black";
+	if(doPsychadelic)
+	{
+		//Opposite of background
+		ctx.fillStyle = "hsl(" + (180+120+currentCol) + ",100%,80%)";
+	}
+	else
+		ctx.fillStyle = "black";
 	let barWidth = canvas.width / dataArray.length * 2.5;
 	let x = 0;
 	for(let i = 0; i < dataArray.length; i++)
 	{
 		let y = canvas.height - dataArray[i];
 
-		ctx.fillRect(x, y, barWidth, dataArray[i]);
+		//±1 pixel to prevent lines between bars
+		ctx.fillRect(x-1, y, barWidth+1, dataArray[i]);
 
 		x += barWidth;
 	}
@@ -420,4 +444,9 @@ function changeExchange()
 		document.getElementById("bitfinexCurrencyPairDiv").style.display = "none";
 		document.getElementById("okexCurrencyPairDiv").style.display = "block";
 	}
+}
+
+function psychadelicChange(e)
+{
+	doPsychadelic = e.target.checked;
 }
