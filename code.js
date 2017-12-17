@@ -8,7 +8,7 @@ let analyser;
 let dataArray;
 let multiplier;
 
-let exchangeWebsocket; 
+let exchangeWebsocket;
 let exchange;
 let currencyPrice;
 let transactionType;
@@ -16,6 +16,7 @@ let product;
 
 let bitfinexTradeChannelID;
 let bitfinexTickerChannelID;
+let poloniexChannelID;
 
 let canvas;
 let ctx;
@@ -75,6 +76,8 @@ function initWebsocket()
 		exchangeWebsocket = new WebSocket("wss://api.bitfinex.com/ws/2");
 	else if(exchange === "OKEX")
 		exchangeWebsocket = new WebSocket("wss://real.okex.com:10441/websocket");
+	else if(exchange === "Poloniex")
+		exchangeWebsocket = new WebSocket("wss://api2.poloniex.com");
 
 	exchangeWebsocket.onopen = websocketOpen;
 	exchangeWebsocket.onclose = websocketClose;
@@ -86,9 +89,11 @@ function initWebsocket()
 		exchangeWebsocket.onmessage = bitfinexMessage;
 	else if(exchange === "OKEX")
 		exchangeWebsocket.onmessage = okexMessage;
+	else if(exchange === "Poloniex")
+		exchangeWebsocket.onmessage = poloniexMessage;
 
 	transactionType = document.getElementById("transactionType").value;
-	if(exchange === "GDAX")
+	if(exchange === "GDAX" || exchange === "Poloniex")
 		product = document.getElementById("gdaxCurrencyPair").value;
 	else if(exchange === "Bitfinex")
 		product = "t" + document.getElementById("bitfinexCurrencyOne").value + "" + document.getElementById("bitfinexCurrencyTwo").value;
@@ -105,6 +110,8 @@ function websocketOpen(e)
 		bitfinexSubscribe(product);
 	else if(exchange === "OKEX")
 		okexSubscribe(product);
+	else if(exchange === "Poloniex")
+		poloniexSubscribe(product);
 }
 
 function gdaxSubscribe(products)
@@ -190,11 +197,24 @@ function okexUnsubscribe(products)
 	}));
 }
 
+function poloniexSubscribe(product)
+{
+	exchangeWebsocket.send(JSON.stringify({
+		command: "subscribe",
+		channel: 1002 //ticker
+	}));
+	exchangeWebsocket.send(JSON.stringify({
+		command: "subscribe",
+		channel: "BTC_ETH"
+	}));
+}
+
 function websocketClose(e)
 {
 	console.log(e);
 
 	exchangeWebsocket = undefined;
+	autobahnWebsocket = undefined;
 	initWebsocket();
 }
 
@@ -205,11 +225,16 @@ function websocketError(e)
 
 function setFrequency(price)
 {
-	oscillator.frequency.linearRampToValueAtTime(
-		(price - currencyPrice)*multiplier + 300,
-		audioContext.currentTime + 0.001
-	);
-	targetCol = (price - currencyPrice)*multiplier;
+	if(currencyPrice)
+	{
+		oscillator.frequency.linearRampToValueAtTime(
+			(price - currencyPrice)*multiplier + 300,
+			audioContext.currentTime + 0.001
+		);
+		targetCol = (price - currencyPrice)*multiplier;
+	}
+	else
+		console.log("Currency Price not set");
 }
 
 function gdaxMessage(e)
@@ -302,8 +327,8 @@ function okexMessage(e)
 		else if(data[0].channel.includes("deals"))
 		{
 			if(transactionType === "both" 
-				|| (data[0].data[0][4] == "ask" && transactionType === "sell")
-				|| (data[0].data[0][4] == "bid" && transactionType === "buy"))
+				|| (data[0].data[0][4] === "ask" && transactionType === "sell")
+				|| (data[0].data[0][4] === "bid" && transactionType === "buy"))
 			{
 				setFrequency(data[0].data[0][1]);
 			}
@@ -316,6 +341,47 @@ function okexMessage(e)
 	else
 	{
 		console.log(data);
+	}
+}
+
+function poloniexMessage(e)
+{
+	let data = JSON.parse(e.data);
+	if(data[0] === 1002)
+	{
+		if(poloniexChannelID && data[2][0] === poloniexChannelID)
+		{
+			currencyPrice = data[2][1];
+		}
+	}
+	else if(data[2] && data[2][0][0] === "i")
+	{
+		poloniexChannelID = data[0];
+	}
+	else
+	{
+		if(data[0] === poloniexChannelID)
+		{
+			for(index in data[2])
+			{
+				let trans = data[2][index];
+				//if(trans[0] === "t") //actual trade ("o" = orderbook)
+				{
+					if(transactionType === "both" 
+						|| (trans[2] === 0 && transactionType === "sell")
+						|| (trans[2] === 1 && transactionType === "buy"))
+					{ 
+						console.log(data);
+						setFrequency(trans[3]);
+						break;
+					}
+				}
+			}
+		}
+		else
+		{
+			console.log(e);
+		}
 	}
 }
 
