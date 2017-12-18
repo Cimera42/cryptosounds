@@ -139,6 +139,13 @@
 			</div>
 		</div>
 		<div id="poloniexCurrencyPairDiv">
+			<label for="orderType">Order Type:</label>
+			<select name="orderType" id="orderType" oninput="orderTypeChanged(event)">
+				<option value="orderbook">Orderbook</option>
+				<option value="trade">Trade</option>
+				<option value="both" selected>Both</option>
+			</select>
+			<br>
 			<label for="poloniexCurrencyPrimary">Primary Currency:</label>
 			<select name="poloniexCurrencyPrimary" id="poloniexCurrencyPrimary" oninput="currencyPairChanged(event)">
 				<option value="BTC" selected>BTC</option>

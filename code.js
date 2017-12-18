@@ -17,6 +17,7 @@ let product;
 let bitfinexTradeChannelID;
 let bitfinexTickerChannelID;
 let poloniexChannelID;
+let poloniexOrderType;
 
 let canvas;
 let ctx;
@@ -103,6 +104,7 @@ function initWebsocket()
 	{
 		let primary = document.getElementById("poloniexCurrencyPrimary").value;
 		product = primary + "_" + document.getElementById("poloniexCurrency" + primary).value;
+		poloniexOrderType = document.getElementById("orderType").value;
 	}
 }
 
@@ -384,7 +386,7 @@ function poloniexMessage(e)
 			{
 				let trans = data[2][index];
 				//console.log(data);
-				if(trans[0] === "o") //actual trade ("o" = orderbook)
+				if(trans[0] === "o" && (poloniexOrderType === "orderbook" || poloniexOrderType === "both")) //actual trade ("o" = orderbook)
 				{
 					if(transactionType === "both" 
 						|| (trans[1] === 0 && transactionType === "sell")
@@ -394,7 +396,7 @@ function poloniexMessage(e)
 						break;
 					}
 				}
-				else if(trans[0] === "t") //actual trade ("o" = orderbook)
+				else if(trans[0] === "t" && (poloniexOrderType === "trade" || poloniexOrderType === "both")) //actual trade ("o" = orderbook)
 				{
 					if(transactionType === "both" 
 						|| (trans[2] === 0 && transactionType === "sell")
@@ -571,6 +573,11 @@ function changeExchange()
 function psychadelicChange(e)
 {
 	doPsychadelic = e.target.checked;
+}
+
+function orderTypeChanged(e)
+{
+	poloniexOrderType = e.target.value;
 }
 
 function poloniexChoiceShow()
