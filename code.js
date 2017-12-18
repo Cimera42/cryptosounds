@@ -93,12 +93,17 @@ function initWebsocket()
 		exchangeWebsocket.onmessage = poloniexMessage;
 
 	transactionType = document.getElementById("transactionType").value;
-	if(exchange === "GDAX" || exchange === "Poloniex")
+	if(exchange === "GDAX")
 		product = document.getElementById("gdaxCurrencyPair").value;
 	else if(exchange === "Bitfinex")
 		product = "t" + document.getElementById("bitfinexCurrencyOne").value + "" + document.getElementById("bitfinexCurrencyTwo").value;
 	else if(exchange === "OKEX")
 		product = document.getElementById("okexCurrencyPair").value;
+	else if(exchange === "Poloniex")
+	{
+		let primary = document.getElementById("poloniexCurrencyPrimary").value;
+		product = primary + "_" + document.getElementById("poloniexCurrency" + primary).value;
+	}
 }
 
 function websocketOpen(e)
@@ -205,7 +210,19 @@ function poloniexSubscribe(product)
 	}));
 	exchangeWebsocket.send(JSON.stringify({
 		command: "subscribe",
-		channel: "BTC_ETH"
+		channel: product
+	}));
+}
+
+function poloniexUnsubscribe(product)
+{
+	exchangeWebsocket.send(JSON.stringify({
+		command: "unsubscribe",
+		channel: 1002 //ticker
+	}));
+	exchangeWebsocket.send(JSON.stringify({
+		command: "unsubscribe",
+		channel: product
 	}));
 }
 
@@ -349,13 +366,14 @@ function poloniexMessage(e)
 	let data = JSON.parse(e.data);
 	if(data[0] === 1002)
 	{
-		if(poloniexChannelID && data[2][0] === poloniexChannelID)
+		if(poloniexChannelID && data[2] && data[2][0] === poloniexChannelID)
 		{
 			currencyPrice = data[2][1];
 		}
 	}
 	else if(data[2] && data[2][0][0] === "i")
 	{
+		console.log(data);
 		poloniexChannelID = data[0];
 	}
 	else
@@ -365,13 +383,23 @@ function poloniexMessage(e)
 			for(index in data[2])
 			{
 				let trans = data[2][index];
-				//if(trans[0] === "t") //actual trade ("o" = orderbook)
+				//console.log(data);
+				if(trans[0] === "o") //actual trade ("o" = orderbook)
+				{
+					if(transactionType === "both" 
+						|| (trans[1] === 0 && transactionType === "sell")
+						|| (trans[1] === 1 && transactionType === "buy"))
+					{ 
+						setFrequency(trans[2]);
+						break;
+					}
+				}
+				else if(trans[0] === "t") //actual trade ("o" = orderbook)
 				{
 					if(transactionType === "both" 
 						|| (trans[2] === 0 && transactionType === "sell")
 						|| (trans[2] === 1 && transactionType === "buy"))
-					{ 
-						console.log(data);
+					{
 						setFrequency(trans[3]);
 						break;
 					}
@@ -399,7 +427,16 @@ function setMultiplier(val)
 	if(val < 0)
 		multiplier = 1 + parseFloat(val);
 	else if(val > 0)
-		multiplier = val*100;
+	{
+		if(val <= 3)
+		{
+			multiplier = val*100;
+		}
+		else
+		{
+			multiplier = 300 + Math.exp(Math.log(499700) * (val-3));
+		}
+	}
 	else
 		multiplier = 1;
 
@@ -480,6 +517,14 @@ function currencyPairChanged(e)
 		product = e.target.value;
 		okexSubscribe(product);
 	}
+	else if(exchange === "Poloniex")
+	{
+		poloniexChoiceShow();
+		poloniexUnsubscribe(product);
+		let primary = document.getElementById("poloniexCurrencyPrimary").value;
+		product = primary + "_" + document.getElementById("poloniexCurrency" + primary).value;
+		poloniexSubscribe(product);
+	}
 }
 
 function exchangeChoiceChanged(e)
@@ -497,22 +542,44 @@ function changeExchange()
 		document.getElementById("gdaxCurrencyPairDiv").style.display = "block";
 		document.getElementById("bitfinexCurrencyPairDiv").style.display = "none";
 		document.getElementById("okexCurrencyPairDiv").style.display = "none";
+		document.getElementById("poloniexCurrencyPairDiv").style.display = "none";
 	}
 	else if(exchange === "Bitfinex")
 	{
 		document.getElementById("gdaxCurrencyPairDiv").style.display = "none";
 		document.getElementById("bitfinexCurrencyPairDiv").style.display = "block";
 		document.getElementById("okexCurrencyPairDiv").style.display = "none";
+		document.getElementById("poloniexCurrencyPairDiv").style.display = "none";
 	}
 	else if(exchange === "OKEX")
 	{
 		document.getElementById("gdaxCurrencyPairDiv").style.display = "none";
 		document.getElementById("bitfinexCurrencyPairDiv").style.display = "none";
 		document.getElementById("okexCurrencyPairDiv").style.display = "block";
+		document.getElementById("poloniexCurrencyPairDiv").style.display = "none";
+	}
+	else if(exchange === "Poloniex")
+	{
+		document.getElementById("gdaxCurrencyPairDiv").style.display = "none";
+		document.getElementById("bitfinexCurrencyPairDiv").style.display = "none";
+		document.getElementById("okexCurrencyPairDiv").style.display = "none";
+		document.getElementById("poloniexCurrencyPairDiv").style.display = "block";
+		poloniexChoiceShow();
 	}
 }
 
 function psychadelicChange(e)
 {
 	doPsychadelic = e.target.checked;
+}
+
+function poloniexChoiceShow()
+{
+	document.querySelectorAll("select[name='poloniexCurrencySecondary']").forEach(
+		v => v.style.display = "none"
+	);
+	document.getElementById("poloniexCurrencyBTC");
+
+	let primary = document.getElementById("poloniexCurrencyPrimary").value;
+	document.getElementById("poloniexCurrency" + primary).style.display = "inline-block";
 }

@@ -4,7 +4,6 @@
 	<head>
 		<meta charset="utf-8">
 		<script defer src="code.js"></script>
-		<script defer src="autobahn-js-built/autobahn.js"></script>
 	</head>
 	<body onload="init()">
 		<canvas id="canvas" width="640" height="480"></canvas>
@@ -14,7 +13,7 @@
 			<output id="volumeOutput" for="volume"></output>
 		<br>
 			<label for="multiplier">Difference Multiplier:</label>
-			<input id="multiplier" type="range" min="-1" max="3" step="any" value="0" oninput="multiplierChange(event)" 
+			<input id="multiplier" type="range" min="-1" max="4" step="any" value="0" oninput="multiplierChange(event)" 
 					ondblclick="resetMultiplier(event)" title="Double click to reset">
 			<output id="multiplierOutput" for="multiplier"></output>
 		<br>
@@ -53,7 +52,7 @@
 			</select>
 		</div>
 		<div id="okexCurrencyPairDiv">
-			<label for="okexCurrencyPair">GDAX Currency Pair:</label>
+			<label for="okexCurrencyPair">OKEX Currency Pair:</label>
 			<select name="okexCurrencyPair" id="okexCurrencyPair" oninput="currencyPairChanged(event)">
 				<option value="btc_usdt" selected>btc_usdt</option>
 				<option value="ltc_btc">ltc_btc</option>
@@ -138,6 +137,77 @@
 				<br>
 				Pair failed, please choose another.
 			</div>
+		</div>
+		<div id="poloniexCurrencyPairDiv">
+			<label for="poloniexCurrencyPrimary">Primary Currency:</label>
+			<select name="poloniexCurrencyPrimary" id="poloniexCurrencyPrimary" oninput="currencyPairChanged(event)">
+				<option value="BTC" selected>BTC</option>
+				<option value="ETH">ETH</option>
+				<option value="XMR">XMR</option>
+				<option value="USDT">USDT</option>
+			</select>
+			<br>
+			<label for="poloniexCurrencySecondary">Secondary Currency:</label>
+			<select name="poloniexCurrencySecondary" id="poloniexCurrencyBTC" oninput="currencyPairChanged(event)">
+				<option value="STR" selected>STR</option>
+				<option value="ETH">ETH</option>
+				<option value="XRP">XRP</option>
+				<option value="DGB">DGB</option>
+				<option value="LTC">LTC</option>
+				<option value="DASH">DASH</option>
+				<option value="XMR">XMR</option>
+				<option value="DOGE">DOGE</option>
+				<option value="BCH">BCH</option>
+				<option value="LSK">LSK</option>
+				<option value="SC">SC</option>
+				<option value="XEM">XEM</option>
+				<option value="BTS">BTS</option>
+				<option value="NXT">NXT</option>
+				<option value="FCT">FCT</option>
+				<option value="ETC">ETC</option>
+				<option value="ZEC">ZEC</option>
+				<option value="EMC2">EMC2</option>
+				<option value="BCN">BCN</option>
+				<option value="STRAT">STRAT</option>
+			</select>
+			<select name="poloniexCurrencySecondary" id="poloniexCurrencyETH" oninput="currencyPairChanged(event)">
+				<option value="BCH">BCH</option>
+				<option value="LSK">LSK</option>
+				<option value="OMG">OMG</option>
+				<option value="ZEC">ZEC</option>
+				<option value="ETC">ETC</option>
+				<option value="ZRX">ZRX</option>
+				<option value="GNT">GNT</option>
+				<option value="GAS">GAS</option>
+				<option value="GNO">GNO</option>
+				<option value="REP">REP</option>
+				<option value="CVC">CVC</option>
+				<option value="STEEM">STEEM</option>
+			</select>
+			<select name="poloniexCurrencySecondary" id="poloniexCurrencyXMR" oninput="currencyPairChanged(event)">
+				<option value="LTC">LTC</option>
+				<option value="DASH">DASH</option>
+				<option value="NXT">NXT</option>
+				<option value="ZEC">ZEC</option>
+				<option value="BCN">BCN</option>
+				<option value="MAID">MAID</option>
+				<option value="BTCD">BTCD</option>
+				<option value="BLK">BLK</option>
+			</select>
+			<select name="poloniexCurrencySecondary" id="poloniexCurrencyUSDT" oninput="currencyPairChanged(event)">
+				<option value="BTC">BTC</option>
+				<option value="STR">STR</option>
+				<option value="LTC">LTC</option>
+				<option value="ETH">ETH</option>
+				<option value="XRP">XRP</option>
+				<option value="BCH">BCH</option>
+				<option value="NXT">NXT</option>
+				<option value="ETC">ETC</option>
+				<option value="ZEC">ZEC</option>
+				<option value="DASH">DASH</option>
+				<option value="XMR">XMR</option>
+				<option value="REP">REP</option>
+			</select>
 		</div>
 	</body>
 </html>
