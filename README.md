@@ -96,6 +96,50 @@ Uses the difference between the overall trading price and price of each transact
 				</ul>
 			</td>
 		</tr>
+		<tr>
+			<td><a href="https://poloniex.com/">Poloniex</a></td>
+			<td>
+				<ul>
+					<li>BCH</li>
+					<li>BCN</li>
+					<li>BLK</li>
+					<li>BTC</li>
+					<li>BTCD</li>
+					<li>BTS</li>
+					<li>CVC</li>
+					<li>DASH</li>
+					<li>DGB</li>
+					<li>DOGE</li>
+					<li>EMC2</li>
+					<li>ETC</li>
+					<li>ETH</li>
+					<li>FCT</li>
+					<li>GAS</li>
+					<li>GNO</li>
+					<li>GNT</li>
+					<li>LSK</li>
+					<li>LTC</li>
+					<li>MAID</li>
+					<li>NXT</li>
+					<li>OMG</li>
+					<li>REP</li>
+					<li>SC</li>
+					<li>STEEM</li>
+					<li>STR</li>
+					<li>STRAT</li>
+					<li>USDT</li>
+					<li>XEM</li>
+					<li>XMR</li>
+					<li>XRP</li>
+					<li>ZEC</li>
+					<li>ZRX</li>
+				</ul>
+			</td>
+			<td>
+				<ul>
+				</ul>
+			</td>
+		</tr>
 	</tbody>
 </table>
 All pair combinations not necessarily available and are subject to change, please check each exchanges website for up to date and accurate information.
