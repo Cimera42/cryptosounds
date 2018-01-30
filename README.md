@@ -146,4 +146,4 @@ All pair combinations not necessarily available and are subject to change, pleas
 
 P.S. GDAX tends to have more trades, and so is the more interesting to listen too.
 
-Feel free to create an [issue](https://cimera42.github.io/cryptosounds/issues) suggesting any changes, as well as to suggest exchanges to implement.
+Feel free to create an [issue](https://github.com/Cimera42/cryptosounds/issues) suggesting any changes, as well as to suggest exchanges to implement.
